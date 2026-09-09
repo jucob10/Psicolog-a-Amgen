@@ -1,0 +1,2582 @@
+/* Tokens heredados del proyecto original (styles.css) + la paleta de series
+   validada. No mezclar ambos roles:
+   los --accent-* visten la UI; los --series-* solo visten datos.
+
+   El tema se elige con `data-theme` en <html> (lo escribe useTheme). El bloque
+   :root define el oscuro y :root[data-theme='light'] sobreescribe SOLO el
+   chrome — los --series-* no aparecen ahí a propósito: la identidad de color de
+   un dato no puede depender de si el usuario prefiere fondo claro. */
+
+/* ── Tipografía autoalojada ──────────────────────────────────────────────
+   Inter variable, subconjunto latino, 48 KB. Antes venía de Google Fonts, lo
+   que rompía la promesa del proyecto: dist/ se abre con doble clic y sin
+   servidor, pero sin internet la fuente no llegaba y todo caía a la del
+   sistema. Un archivo variable cubre los pesos 100–900 sin cinco descargas. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/inter-latin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ── Tipografía de cifras ────────────────────────────────────────────────
+   IBM Plex Mono, subconjunto latino, dos pesos, 30 KB en total. Copiada de
+   `@fontsource/ibm-plex-mono` a este directorio a mano y declarada aquí, igual
+   que Inter y por el mismo motivo: el modo autónomo la convierte en data URI y
+   así no depende de que la resuelva nadie.
+
+   Por qué una segunda familia y no Inter en negrita: en un tablero, la CIFRA y
+   el TEXTO son dos registros distintos —uno se compara, el otro se lee— y hasta
+   ahora los dos iban en Inter, así que la interfaz no lo decía por ningún lado.
+   Plex Mono es de IBM y está dibujada para contexto técnico y científico, que
+   es exactamente el registro de esto; sus cifras tienen ancho fijo de verdad,
+   no solo `tnum`, así que una columna de miles queda a plomo aunque cambie el
+   dato. Y no es una fuente de editor de código disfrazada: al lado de Inter se
+   lee como instrumento, no como terminal. */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+    U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/ibm-plex-mono-latin-600-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+    U+FFFD;
+}
+
+:root {
+  --bg-primary: #0f1117;
+  --bg-secondary: #181b23;
+  --bg-card: #1e2130;
+  --bg-card-hover: #252840;
+  --bg-input: #252840;
+  --border: #2a2d3e;
+  --border-light: #3a3d4e;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0b0;
+  --text-muted: #6b7280;
+
+  --accent-blue: #3b82f6;
+  --accent-blue-light: #7fb2ef;
+  --accent-green: #10b981;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-purple: #8b5cf6;
+  --accent-cyan: #06b6d4;
+  --accent-pink: #ec4899;
+
+  /* Tintes translúcidos: se apoyan en el fondo, así que cambian con el tema. */
+  --tint-blue: rgba(57, 135, 229, 0.09);
+  --tint-blue-strong: rgba(57, 135, 229, 0.35);
+  --tint-row: rgba(57, 135, 229, 0.14);
+  --tint-red: rgba(239, 68, 68, 0.12);
+  --tint-amber: rgba(201, 133, 0, 0.13);
+  --tint-green: rgba(16, 185, 129, 0.12);
+  --tint-bar: rgba(57, 135, 229, 0.20);
+
+  --ink-good: #6ee7b7;
+  --ink-bad: #fca5a5;
+  --ink-warn: #fcd34d;
+
+  /* Paleta categórica de datos — validada sobre --bg-card (#1e2130):
+     banda de luminosidad, piso de croma, separación CVD adyacente ≥8,
+     piso visión normal ≥15 y contraste ≥3:1. Orden fijo, nunca ciclado.
+     Los ocho superan también 3:1 contra el blanco, así que valen igual en el
+     tema claro y no hay una segunda paleta que mantener. */
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+  --series-other: #6b7280;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Escala de espaciado ───────────────────────────────────────────────
+     Antes había 41 valores de `padding` y 14 de `gap` sin relación entre sí
+     —9px aquí, 11px allá, 7px más abajo—: nada caía en la misma rejilla y el
+     conjunto se leía hecho a mano. Base de 4 px con dos medios pasos (2 y 6)
+     porque esto es una interfaz densa: badges y chips necesitan el extremo
+     pequeño que una escala de solo múltiplos de 4 no da.
+     Los espacios NO cambian con el tema: no describen color, describen ritmo. */
+  --sp-2xs: 2px;
+  --sp-xs: 4px;
+  --sp-sm: 6px;
+  --sp-md: 8px;
+  --sp-lg: 12px;
+  --sp-xl: 16px;
+  --sp-2xl: 24px;
+  --sp-3xl: 32px;
+  --sp-4xl: 48px;
+  --sp-5xl: 64px;
+
+  /* ── Escala tipográfica ────────────────────────────────────────────────
+     De 16 tamaños a 9. Los medios píxeles (10.5, 11.5, 12.5) eran el síntoma:
+     no salían de una escala, salían de ajustar a ojo caso por caso, y a esos
+     tamaños medio píxel no se distingue — solo impide que dos cosas del mismo
+     rango se vean iguales. Cada paso tiene un trabajo asignado. */
+  --fs-micro: 10px; /* etiquetas en versal, muy cortas */
+  --fs-xs: 11px; /* metadatos, cabeceras de tabla, insignias */
+  --fs-sm: 12px; /* texto secundario, chips, notas */
+  --fs-base: 13px; /* cuerpo, datos de tabla, controles */
+  --fs-md: 15px; /* subtítulos y marca */
+  --fs-lg: 18px; /* títulos de sección */
+  --fs-xl: 22px; /* cifra de alerta */
+  --fs-2xl: 28px; /* cifra de KPI */
+  --fs-3xl: 40px; /* cifra destacada */
+  --fs-display: clamp(30px, 5.2vw, 46px); /* solo la portada */
+
+  /* Dos familias, dos trabajos: `--font-ui` lee, `--font-num` se compara. */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-num: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* La retícula del fondo. Sobre negro hace falta más tinta para llegar a la
+     misma presencia que sobre blanco. */
+  --panal-opacidad: 0.075;
+}
+
+/* ── Tema claro ──────────────────────────────────────────────────────────
+   Los acentos NO son los mismos tonos aclarados: sobre blanco, el #3b82f6 del
+   tema oscuro se queda en 3.7:1 y el texto de una pestaña activa a 13px
+   necesita 4.5:1. Se sustituyen por versiones más oscuras que sí llegan. */
+:root[data-theme='light'] {
+  --bg-primary: #f4f6fa;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #eef2f8;
+  --bg-input: #ffffff;
+  --border: #e4e9f2;
+  --border-light: #cbd5e1;
+  --text-primary: #161a25;
+  --text-secondary: #545b6c;
+  --text-muted: #7d8493;
+
+  --accent-blue: #1d4ed8; /* 6.7:1 sobre blanco */
+  --accent-blue-light: #1d4ed8;
+  --accent-green: #047857;
+  --accent-orange: #b45309;
+  --accent-red: #c81e1e;
+  --accent-purple: #6d28d9;
+
+  --tint-blue: rgba(29, 78, 216, 0.06);
+  --tint-blue-strong: rgba(29, 78, 216, 0.28);
+  --tint-row: rgba(29, 78, 216, 0.09);
+  --tint-red: rgba(200, 30, 30, 0.08);
+  --tint-amber: rgba(180, 83, 9, 0.09);
+  --tint-green: rgba(4, 120, 87, 0.08);
+  --tint-bar: rgba(29, 78, 216, 0.13);
+
+  --ink-good: #047857;
+  --ink-bad: #b91c1c;
+  --ink-warn: #92400e;
+
+  --shadow-sm: 0 1px 2px rgba(22, 26, 37, 0.06);
+  --shadow-md: 0 4px 14px rgba(22, 26, 37, 0.08);
+  --shadow-lg: 0 10px 30px rgba(22, 26, 37, 0.14);
+
+  --panal-opacidad: 0.05;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+select {
+  font-family: inherit;
+}
+
+/* Foco visible en TODO lo enfocable. Antes no había ninguna regla: navegando
+   con teclado no se sabía dónde se estaba. `:focus-visible` y no `:focus` para
+   que el anillo no aparezca al hacer clic con el ratón. */
+:where(button, a, input, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Quien haya pedido menos movimiento en su sistema no debería ver contadores
+   animándose ni tarjetas deslizándose. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Fondo vivo de la aplicación ───────────────────────────────────────────
+   Una retícula de panal con un átomo en cada vértice: es un diagrama de enlaces,
+   que es el dibujo propio de esta industria y no un adorno genérico de tablero.
+   Va detrás de todo, se apaga hacia los bordes y se mueve muy despacio —un ciclo
+   completo son 90 segundos—, así que se percibe como profundidad y no como
+   animación. Con `prefers-reduced-motion` la regla global la deja quieta y la
+   retícula sigue ahí: era fondo, no movimiento.
+
+   Todo el movimiento es `transform` sobre una capa propia: no toca el diseño de
+   nada y el compositor lo resuelve sin recalcular estilo. */
+.app-fondo {
+  position: fixed;
+  inset: 0;
+  /* Negativo, y es la pieza clave. Con `z-index: 0` esta capa se pondría por
+     DELANTE del contenido: los demás hijos de `.app` están sin posicionar, y lo
+     no posicionado se pinta por debajo de lo posicionado aunque vaya después en
+     el documento. La alternativa —subir a `z-index: 1` a todos los hermanos—
+     obliga a un selector más específico que `.app-header`, y le machacaría su
+     `z-index: 40`: la cabecera pegajosa dejaría de estar por encima de la tabla
+     que pasa bajo ella. En negativo, el fondo cae por debajo de todo el
+     contenido y por encima del fondo del documento, sin tocar a nadie.
+     Requisito: que ningún ancestro cree contexto de apilamiento — `.app` no lo
+     hace, y por eso no puede llevar `transform`, `filter` ni `isolation`. */
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.app-fondo::before {
+  content: '';
+  position: absolute;
+  /* Se dibuja más grande que la pantalla porque la capa se desplaza: si midiera
+     lo justo, al moverse asomaría el borde. */
+  inset: -120px;
+  background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2256%22%20height%3D%22100%22%20viewBox%3D%220%200%2056%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%233987e5%22%20stroke-width%3D%221.1%22%3E%3Cpath%20d%3D%22M28%2066L0%2050L0%2016L28%200L56%2016L56%2050L28%2066L28%20100%22%2F%3E%3Cpath%20d%3D%22M28%200L28%2034L0%2050L0%2084L28%20100L56%2084L56%2050L28%2034%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%233987e5%22%3E%3Ccircle%20cx%3D%2228%22%20cy%3D%220%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%220%22%20cy%3D%2216%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%2256%22%20cy%3D%2216%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%2228%22%20cy%3D%2234%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%220%22%20cy%3D%2250%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%2256%22%20cy%3D%2250%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%2228%22%20cy%3D%2266%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%220%22%20cy%3D%2284%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%2256%22%20cy%3D%2284%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%2228%22%20cy%3D%22100%22%20r%3D%222%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+  background-size: 56px 100px;
+  opacity: var(--panal-opacidad);
+  -webkit-mask-image: radial-gradient(ellipse 78% 68% at 50% 34%, #000 12%, transparent 76%);
+  mask-image: radial-gradient(ellipse 78% 68% at 50% 34%, #000 12%, transparent 76%);
+  animation: panal-deriva 90s linear infinite;
+}
+
+/* Un ciclo entero = un mosaico exacto (56 x 100), así que el salto al reiniciar
+   cae justo donde el dibujo se repite y no se ve. */
+@keyframes panal-deriva {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-56px, -100px, 0);
+  }
+}
+
+/* El foco que sigue al cursor. Mismo recurso que la portada y por lo mismo: las
+   coordenadas viajan por variable CSS desde el propio evento, así que mover el
+   ratón no provoca ni un renderizado de React. */
+.app-fondo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 30%),
+    var(--tint-blue),
+    transparent 70%
+  );
+  transition: opacity 0.4s ease;
+}
+
+/* Ancho de preparación del informe.
+   Se pone durante un instante justo antes de abrir el diálogo de impresión, para
+   que ECharts redibuje las gráficas al ancho que van a tener en el papel en vez
+   de al de la pantalla. Ver `usePrintReport`.
+
+   1000 px y no 1047 (A4 apaisado) a propósito: hay que quedarse por DEBAJO del
+   papel más estrecho que se pueda usar —Carta apaisada da 980 px— porque una
+   gráfica algo más angosta que su tarjeta solo deja un margen, mientras que una
+   más ancha se sale. Errar por defecto aquí es gratis; por exceso, no. */
+html.informe-preparando .main {
+  width: 1000px;
+  max-width: 1000px;
+  padding: 0;
+}
+
+/* ===== VENTANA DE ENVÍO ===== */
+
+.modal-fondo {
+  position: fixed;
+  inset: 0;
+  /* Por encima de la cabecera pegajosa (40) y por debajo de la portada (60). */
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-2xl);
+  background: rgba(6, 8, 14, 0.62);
+  backdrop-filter: blur(3px);
+  animation: modal-fondo-entra 0.16s ease both;
+}
+
+.modal {
+  width: min(560px, 100%);
+  /* Nunca más alto que la ventana: en un portátil bajo, el pie con los botones
+     se quedaría fuera de la pantalla y no habría forma de enviar. */
+  max-height: min(88vh, 760px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: modal-entra 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes modal-fondo-entra {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-entra {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  padding: var(--sp-xl) var(--sp-xl) var(--sp-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-head h2 {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.modal-cerrar {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-lg);
+  line-height: 1;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.modal-cerrar:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.modal-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-lg);
+  padding: var(--sp-xl);
+  overflow-y: auto;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+}
+
+.campo > span {
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: var(--sp-md) var(--sp-lg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--fs-base);
+  transition: var(--transition);
+}
+
+.campo textarea {
+  resize: vertical;
+  line-height: 1.55;
+  /* El cuerpo del correo se lee tal cual va a llegar: sin proporcional que
+     disimule los saltos de línea que sí se van a enviar. */
+  font-family: var(--font-ui);
+}
+
+.campo input:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px var(--tint-blue);
+}
+
+.campo-par {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-lg);
+}
+
+.modal-aviso {
+  border-left: 2px solid var(--accent-orange);
+  padding-left: var(--sp-lg);
+  line-height: 1.6;
+}
+
+.modal-listo {
+  border-left: 2px solid var(--accent-green);
+  padding-left: var(--sp-lg);
+}
+
+.modal-pie {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-md);
+  padding: var(--sp-lg) var(--sp-xl);
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 620px) {
+  .campo-par {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-pie {
+    flex-wrap: wrap;
+  }
+}
+
+/* ===== LAYOUT ===== */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2xl);
+  padding: var(--sp-lg) var(--sp-2xl);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  /* Solo la sombra hace transición: con `var(--transition)`, que es `all`, el
+     color de fondo también animaría al cambiar de tema y la cabecera llegaría
+     tarde al resto de la página. */
+  transition: box-shadow 0.2s ease;
+}
+
+/* Una cabecera pegajosa sin sombra deja el contenido pasando por debajo sin que
+   nada diga que hay dos planos: la fila que desaparece parece cortada. La
+   sombra aparece solo cuando hay algo debajo, así que en reposo la cabecera
+   sigue plana. */
+.app-header.is-scrolled {
+  box-shadow: var(--shadow-md);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #3987e5, #1d4ed8);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: var(--fs-md);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.brand-title {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.brand-sub {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.prog-switch {
+  display: flex;
+  gap: var(--sp-xs);
+  background: var(--bg-card);
+  padding: var(--sp-xs);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.prog-btn {
+  padding: var(--sp-sm) var(--sp-xl);
+  border-radius: 7px;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.prog-btn:hover {
+  color: var(--text-primary);
+}
+
+.prog-btn.active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+}
+
+.data-status {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  padding: var(--sp-sm) var(--sp-lg);
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* Botón cuadrado de solo icono (tema, exportar). */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  background: var(--bg-card-hover);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--sp-2xs);
+  padding: 0 var(--sp-2xl);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn {
+  padding: var(--sp-lg) var(--sp-xl);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
+.main {
+  flex: 1;
+  padding: var(--sp-2xl) var(--sp-2xl) var(--sp-4xl);
+  max-width: 1720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Cambiar de pestaña ya no es un corte seco. 140 ms bastan para que el ojo
+   siga el cambio sin que nadie tenga que esperar a la animación. */
+.view-enter {
+  animation: viewIn 0.14s ease-out;
+}
+
+@keyframes viewIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ===== FILTROS ===== */
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-lg);
+  padding: var(--sp-lg) var(--sp-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+  min-width: 150px;
+  flex: 1 1 150px;
+  max-width: 260px;
+}
+
+.filter-group > label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.filter-group select,
+.filter-group input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  padding: var(--sp-md) var(--sp-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-base);
+  outline: none;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  border-color: var(--accent-blue);
+}
+
+.btn {
+  padding: var(--sp-md) var(--sp-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  white-space: nowrap;
+}
+
+.btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+  background: var(--bg-card-hover);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn:disabled:hover {
+  color: var(--text-secondary);
+  border-color: var(--border-light);
+  background: none;
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+  border-color: var(--accent-blue);
+  color: #fff;
+}
+
+.btn-sm {
+  padding: var(--sp-sm) var(--sp-lg);
+  font-size: var(--fs-sm);
+}
+
+/* ===== CHIPS DE CROSS-FILTER ===== */
+.crossfilter-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-md);
+  margin-bottom: 16px;
+  padding: var(--sp-lg);
+  border-radius: var(--radius-md);
+  background: var(--tint-blue);
+  border: 1px solid var(--tint-blue-strong);
+}
+
+.crossfilter-bar .cf-label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  padding: var(--sp-xs) var(--sp-md) var(--sp-xs) var(--sp-lg);
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.chip .chip-dim {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.chip button {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  background: var(--bg-card-hover);
+  font-size: var(--fs-sm);
+  line-height: 1;
+}
+
+.chip button:hover {
+  color: #fff;
+  background: var(--accent-red);
+}
+
+/* ===== KPIs ===== */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(168px, 100%), 1fr));
+  gap: var(--sp-lg);
+  margin-bottom: 18px;
+  align-items: stretch;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--kpi-accent, var(--accent-blue));
+}
+
+.kpi-card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* El KPI de portada. Ocupa dos columnas y sube el cuerpo del número: sin esto,
+   siete tarjetas idénticas obligan a leerlas todas para saber cuál importa. */
+.kpi-card-hero {
+  grid-column: span 2;
+  padding: var(--sp-xl) var(--sp-2xl);
+}
+
+.kpi-card-hero .kpi-value {
+  font-size: var(--fs-3xl);
+}
+
+.kpi-card-hero::before {
+  width: 4px;
+}
+
+.kpi-label {
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.kpi-main {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-md);
+  flex-wrap: wrap;
+}
+
+.kpi-value {
+  font-family: var(--font-num);
+  font-size: var(--fs-2xl);
+  /* 600 y no 800: Plex Mono pesa mas que Inter al mismo numero, y a 28 px un
+     800 cerraba los contraojos del 8 y del 0. */
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* El delta lleva flecha Y signo además del color: el par verde/rojo es
+   precisamente el que no se distingue en la deficiencia de color más común. */
+.kpi-delta {
+  font-family: var(--font-num);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  padding: var(--sp-2xs) var(--sp-md);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.kpi-delta-up {
+  color: var(--ink-good);
+  background: var(--tint-green);
+}
+
+.kpi-delta-down {
+  color: var(--ink-bad);
+  background: var(--tint-red);
+}
+
+.kpi-delta-flat {
+  color: var(--text-muted);
+  background: var(--bg-card-hover);
+}
+
+.sparkline {
+  display: block;
+  margin-top: 2px;
+  overflow: visible;
+}
+
+.kpi-hint {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+/* ===== ALERTAS ===== */
+.alerts {
+  margin-bottom: 18px;
+}
+
+.alerts-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-lg);
+  margin-bottom: 10px;
+}
+
+.alerts-summary {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: var(--sp-lg);
+}
+
+.alert {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+  padding: var(--sp-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  text-align: left;
+  transition: var(--transition);
+  border-left-width: 3px;
+  font-family: inherit;
+}
+
+button.alert {
+  cursor: pointer;
+}
+
+button.alert:hover {
+  border-color: var(--border-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.alert-critico {
+  border-left-color: var(--accent-red);
+  background: var(--tint-red);
+}
+
+.alert-atencion {
+  border-left-color: var(--series-4);
+  background: var(--tint-amber);
+}
+
+.alert-dato {
+  border-left-color: var(--text-muted);
+}
+
+.alert-active {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 1px;
+}
+
+.alert-top {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.alert-badge {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-micro);
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.alert-critico .alert-badge {
+  background: var(--accent-red);
+}
+.alert-atencion .alert-badge {
+  background: var(--series-4);
+}
+.alert-dato .alert-badge {
+  background: var(--text-muted);
+}
+
+.alert-level {
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.alert-count {
+  margin-left: auto;
+  font-family: var(--font-num);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.alert-title {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.alert-base {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.alert-rule {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  line-height: 1.4;
+  border-top: 1px dashed var(--border-light);
+  padding-top: var(--sp-sm);
+  margin-top: 2px;
+}
+
+.alerts-clear {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  padding: var(--sp-lg) var(--sp-xl);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--tint-green);
+  color: var(--text-secondary);
+  font-size: var(--fs-base);
+  margin-bottom: 18px;
+}
+
+.alerts-clear svg {
+  color: var(--accent-green);
+  flex-shrink: 0;
+}
+
+.alerts-clear strong {
+  color: var(--text-primary);
+}
+
+/* ===== TARJETAS / GRID ===== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-xl);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-lg);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.card-title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.card-sub {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.card-actions {
+  display: flex;
+  gap: var(--sp-sm);
+  align-items: center;
+}
+
+.card-sub + .card-actions {
+  margin-left: 0;
+}
+
+.card-actions:first-of-type {
+  margin-left: auto;
+}
+
+/* `min()` en lugar de un valor fijo: la columna nunca puede pedir más ancho del
+   que hay, así que el grid no desborda en portátiles de 1366 px ni en tablet. */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
+  gap: var(--sp-xl);
+  margin-bottom: 16px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(430px, 100%), 1fr));
+  gap: var(--sp-xl);
+  margin-bottom: 16px;
+}
+
+/* Cuatro tablas resumen en fila, como la `summary-row` del original. El mínimo
+   es más estrecho que en `.grid-3` porque son tablas de tres columnas cortas:
+   por debajo de eso el `auto-fit` reparte en dos filas de dos, que es lo que se
+   quiere en portátil. */
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: var(--sp-xl);
+  margin-bottom: 16px;
+}
+
+/* Fila del mapa. Necesita su propio reparto porque un mapa conserva su
+   proporción y Colombia es más alta que ancha: en media pantalla apaisada
+   quedaría un océano de tarjeta vacía a los lados. La columna estrecha es para
+   el mapa; la ancha, para la barra, que sí agradece el espacio horizontal. */
+.grid-geo {
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: var(--sp-xl);
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1000px) {
+  .grid-geo {
+    grid-template-columns: 1fr;
+  }
+}
+
+.map-note {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 8px;
+  padding-top: var(--sp-md);
+  border-top: 1px dashed var(--border-light);
+}
+
+.map-note strong {
+  color: var(--text-secondary);
+}
+
+/* ===== TABLAS ===== */
+.table-scroll {
+  overflow: auto;
+  max-height: 290px;
+  margin: -4px;
+  padding: var(--sp-xs);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-base);
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  text-align: left;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: var(--sp-md) var(--sp-lg);
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+  z-index: 1;
+}
+
+tbody td {
+  padding: var(--sp-md) var(--sp-lg);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover td {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+td.num,
+th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Solo las celdas de datos: el `th` sigue en Inter porque es un rotulo, no una
+   cifra, y en versal estrecha Plex Mono se lee peor. */
+td.num,
+tfoot td.num {
+  font-family: var(--font-num);
+  font-size: var(--fs-sm);
+  letter-spacing: -0.02em;
+}
+
+tfoot td {
+  padding: var(--sp-md) var(--sp-lg);
+  border-top: 1px solid var(--border-light);
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.row-clickable {
+  cursor: pointer;
+}
+
+/* `background-color` y no el atajo `background`: el atajo con !important
+   reiniciaría `background-image`, y con él la barra de proporción de abajo. */
+.row-active td {
+  background-color: var(--tint-row) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ── Barra de proporción en las tablas resumen ─────────────────────────────
+   Una tabla de conteos obliga a comparar cifras mentalmente: para saber si
+   Sanitas pesa el doble que Nueva EPS hay que restar dos números de cuatro
+   dígitos. La barra lo dice sin leer. Va detrás de la celda del nombre, que es
+   la ancha, y crece de izquierda a derecha; las cifras siguen alineadas a la
+   derecha y limpias.
+
+   El color es azul neutro a propósito, no el de la serie: el `swatch` de al
+   lado ya codifica IDENTIDAD (qué EPS es), y la barra codifica MAGNITUD. Dos
+   trabajos distintos no deben compartir canal de color, o dejan de leerse.
+
+   Es `background-image` translúcido, así que el color de hover y el de fila
+   activa se ven a través en lugar de taparla. */
+.summary-table tbody td:first-child {
+  background-image: linear-gradient(
+    to right,
+    var(--tint-bar) 0 var(--w, 0%),
+    transparent var(--w, 0%)
+  );
+  background-repeat: no-repeat;
+}
+
+.swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  margin-right: 8px;
+  vertical-align: baseline;
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--sp-2xs) var(--sp-md);
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.badge-good {
+  color: var(--ink-good);
+  border-color: var(--accent-green);
+  background: var(--tint-green);
+}
+
+.badge-bad {
+  color: var(--ink-bad);
+  border-color: var(--accent-red);
+  background: var(--tint-red);
+}
+
+.badge-neutral {
+  color: var(--text-secondary);
+  border-color: var(--border-light);
+  background: var(--bg-card-hover);
+}
+
+/* ===== ESTADO VACÍO ===== */
+.empty {
+  display: grid;
+  place-items: center;
+  gap: var(--sp-xl);
+  text-align: center;
+  padding: var(--sp-5xl) var(--sp-2xl);
+  color: var(--text-muted);
+}
+
+.empty h2 {
+  font-size: var(--fs-lg);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.empty p {
+  font-size: var(--fs-base);
+  max-width: 460px;
+  line-height: 1.6;
+}
+
+.empty-actions {
+  display: flex;
+  gap: var(--sp-lg);
+  margin-top: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chart-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+/* ===== ESQUELETOS ===== */
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--bg-card-hover) 25%,
+    var(--border) 37%,
+    var(--bg-card-hover) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+
+.skeleton-stack {
+  display: grid;
+  gap: var(--sp-lg);
+  padding: var(--sp-sm) 0;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0 50%;
+  }
+}
+
+/* ===== DROPZONE ===== */
+.dropzone {
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4xl) var(--sp-2xl);
+  text-align: center;
+  background: var(--tint-blue);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.dropzone:hover,
+.dropzone.over {
+  border-color: var(--accent-blue);
+  background: var(--tint-blue);
+  filter: brightness(1.15);
+}
+
+.dropzone.busy {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.dropzone h3 {
+  font-size: var(--fs-md);
+  margin-bottom: 6px;
+}
+
+.dropzone p {
+  font-size: var(--fs-base);
+  color: var(--text-secondary);
+}
+
+.upload-status {
+  margin-top: 14px;
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+
+.note {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.note code {
+  background: var(--bg-card-hover);
+  padding: var(--sp-2xs) var(--sp-sm);
+  border-radius: 4px;
+  font-size: var(--fs-sm);
+}
+
+/* ===== TOASTS ===== */
+/* Antes cada toast era `position: fixed` en la misma coordenada, así que dos
+   avisos seguidos se dibujaban uno encima de otro. Ahora la pila es el
+   contenedor y los toasts son hijos normales. */
+.toast-stack {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--sp-md);
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.toast {
+  padding: var(--sp-lg) var(--sp-xl);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  animation: slideIn 0.25s ease;
+  max-width: min(380px, calc(100vw - 44px));
+  pointer-events: auto;
+}
+
+.toast.error {
+  border-color: var(--accent-red);
+  color: var(--ink-bad);
+}
+
+.toast.ok {
+  border-color: var(--accent-green);
+  color: var(--ink-good);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  padding: var(--sp-md) var(--sp-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-base);
+  outline: none;
+  min-width: min(260px, 100%);
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+
+.search-input:focus {
+  border-color: var(--accent-blue);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar .spacer {
+  margin-left: auto;
+}
+
+/* ===== SUB-PESTAÑAS ===== */
+.subtabs {
+  display: flex;
+  gap: var(--sp-xs);
+  margin-bottom: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-xs);
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.subtab {
+  padding: var(--sp-md) var(--sp-xl);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.subtab:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
+.subtab.active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+/* ===== MULTISELECT ===== */
+.ms-wrap {
+  position: relative;
+}
+
+.ms-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  padding: var(--sp-md) var(--sp-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-base);
+  text-align: left;
+  min-width: 150px;
+  width: 100%;
+  transition: var(--transition);
+}
+
+.ms-trigger:hover {
+  border-color: var(--text-muted);
+}
+
+.ms-trigger.ms-active {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue-light);
+}
+
+.ms-summary {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ms-caret {
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+}
+
+.ms-panel {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 5px);
+  left: 0;
+  min-width: 240px;
+  max-width: 340px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.ms-panel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  padding: var(--sp-md) var(--sp-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.ms-panel-head button {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--accent-blue);
+  padding: var(--sp-xs) var(--sp-md);
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+}
+
+.ms-panel-head button:disabled {
+  color: var(--text-muted);
+  cursor: default;
+  opacity: 0.55;
+}
+
+.ms-count {
+  margin-left: auto;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.ms-options {
+  max-height: 260px;
+  overflow-y: auto;
+  padding: var(--sp-xs);
+}
+
+.ms-option {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  padding: var(--sp-sm) var(--sp-md);
+  border-radius: 6px;
+  font-size: var(--fs-base);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.ms-option:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.ms-option input {
+  accent-color: var(--accent-blue);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.ms-empty {
+  padding: var(--sp-lg);
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* ===== MIGA DE PAN DEL DRILLDOWN ===== */
+.drill-crumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  font-size: var(--fs-sm);
+  margin-left: auto;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.drill-crumbs button {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.drill-crumbs button:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.drill-crumbs button:not(:disabled):hover {
+  text-decoration: underline;
+}
+
+.drill-crumbs .sep {
+  opacity: 0.5;
+}
+
+.drill-crumbs .current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ===== ENCABEZADO DE IMPRESIÓN ===== */
+/* Solo existe en papel: en pantalla la cabecera de la aplicación ya dice esto. */
+.print-header {
+  display: none;
+}
+
+/* ===== PORTADA ===== */
+/* El azul de marca de Amgen, tomado del SVG oficial de amgen.co. Vive aquí y
+   solo lo usa la portada: no entra en la paleta de datos, porque un color
+   corporativo dentro de una gráfica compite con el significado de la serie. */
+:root {
+  --amgen: #0063c3;
+  --landing-bg: #070b14;
+  --landing-halo: #0d1626;
+  /* El panel tiene que ser bastante opaco: debajo gira el degradado cónico del
+     borde, y si el panel transparenta, ese giro se ve por TODA la tarjeta en
+     lugar de asomar solo por el filo de 1 px. Se vio en la primera revisión:
+     parecía una fuga de luz, no un contorno. */
+  --landing-panel: rgba(17, 24, 39, 0.76);
+  --landing-borde: rgba(255, 255, 255, 0.09);
+  --landing-logo: #ffffff;
+  --aurora-op: 0.5;
+}
+
+:root[data-theme='light'] {
+  --landing-bg: #f6f8fc;
+  --landing-halo: #e9f1fb;
+  --landing-panel: rgba(255, 255, 255, 0.93);
+  --landing-borde: rgba(11, 32, 66, 0.1);
+  /* Sobre claro, el logo va en su azul oficial; sobre oscuro se invierte a
+     blanco, porque #0063C3 contra #070b14 se queda en 3.25:1 y pierde cuerpo. */
+  --landing-logo: var(--amgen);
+  --aurora-op: 0.32;
+}
+
+.landing {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  /* Halo alto y frío detrás del logotipo: da profundidad sin depender de las
+     auroras, que son las que se apagan con `prefers-reduced-motion`. */
+  background: radial-gradient(ellipse 120% 78% at 50% -8%, var(--landing-halo), var(--landing-bg) 62%);
+  padding: var(--sp-4xl) var(--sp-2xl);
+}
+
+.landing-fondo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Manchas de luz. Son `radial-gradient` movidas con `transform`, no elementos
+   con `filter: blur()`: el desenfoque de un elemento grande se recalcula en cada
+   fotograma y aquí no hace falta, el degradado ya nace difuso. */
+.aurora {
+  position: absolute;
+  border-radius: 50%;
+  opacity: var(--aurora-op);
+  will-change: transform;
+}
+
+.aurora-1 {
+  width: 62vw;
+  height: 62vw;
+  top: -22vw;
+  left: -12vw;
+  background: radial-gradient(circle, rgba(0, 99, 195, 0.55), rgba(0, 99, 195, 0) 68%);
+  animation: deriva-1 26s ease-in-out infinite;
+}
+
+.aurora-2 {
+  width: 52vw;
+  height: 52vw;
+  right: -14vw;
+  bottom: -18vw;
+  background: radial-gradient(circle, rgba(37, 130, 235, 0.42), rgba(37, 130, 235, 0) 68%);
+  animation: deriva-2 32s ease-in-out infinite;
+}
+
+.aurora-3 {
+  width: 38vw;
+  height: 38vw;
+  top: 32%;
+  left: 46%;
+  background: radial-gradient(circle, rgba(0, 160, 220, 0.24), rgba(0, 160, 220, 0) 70%);
+  animation: deriva-3 38s ease-in-out infinite;
+}
+
+@keyframes deriva-1 {
+  50% {
+    transform: translate3d(7vw, 5vh, 0) scale(1.12);
+  }
+}
+@keyframes deriva-2 {
+  50% {
+    transform: translate3d(-6vw, -6vh, 0) scale(1.08);
+  }
+}
+@keyframes deriva-3 {
+  50% {
+    transform: translate3d(-9vw, 4vh, 0) scale(0.92);
+  }
+}
+
+/* Retícula fina, quieta, desvanecida hacia los bordes: da sensación de plano
+   técnico sin pedir un solo fotograma de cálculo. */
+/* El globo. Cuadrado y centrado sobre el bloque de contenido, más ancho que
+   alto de caja para que en pantallas apaisadas no se coma los laterales.
+   `min()` contra vh y vw: nunca puede pedir más de lo que hay, así que en un
+   portátil bajo no empuja las tarjetas fuera de la pantalla. */
+.landing-globo {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: min(118vh, 96vw, 1000px);
+  height: min(118vh, 96vw, 1000px);
+  transform: translate(-50%, -50%);
+  /* Se apaga hacia los bordes, pero MUY por fuera de lo que se dibuja.
+     Cuidado con estos dos números. El degradado se mide desde el centro hasta
+     la esquina —0,707 del lado—, mientras que el globo llega a 0,42 del lado y
+     los arcos a 0,48. Con los valores de antes (38 % y 72 %) la máscara empezaba
+     a apagar a 0,27 del lado: el limbo del globo quedaba al 37 % y las cápsulas
+     al 13 %, que multiplicado por la opacidad de aquí abajo daba un 11 % — por
+     eso los envíos se veían como puntos y no como cápsulas.
+     Ahora es opaca hasta 0,51 del lado, o sea más allá de los arcos, y solo se
+     desvanece el halo, que es lo único que hay de ahí para fuera. */
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 72%, transparent 100%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 72%, transparent 100%);
+  opacity: 0.92;
+  /* Entra revelándose, no apareciendo: la portada ya tiene su secuencia de
+     entrada y esto se suma a ella en vez de interrumpirla. */
+  animation: globo-entra 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes globo-entra {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  to {
+    opacity: 0.92;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.landing-reticula {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--landing-borde) 1px, transparent 1px),
+    linear-gradient(90deg, var(--landing-borde) 1px, transparent 1px);
+  background-size: 62px 62px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 62% at 50% 44%, #000 22%, transparent 78%);
+  mask-image: radial-gradient(ellipse 70% 62% at 50% 44%, #000 22%, transparent 78%);
+  opacity: 0.55;
+}
+
+.landing-tema {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  z-index: 2;
+}
+
+.landing-contenido {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 940px;
+  display: grid;
+  gap: var(--sp-3xl);
+}
+
+/* Entrada escalonada. Cada pieza entra con 100 ms de diferencia: la vista
+   recorre el orden de lectura en lugar de recibirlo todo de golpe. */
+.landing-cabecera,
+.acceso,
+.landing-pie,
+.landing-nota {
+  opacity: 0;
+  animation: subir 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.landing-cabecera {
+  animation-delay: 0.05s;
+  display: grid;
+  gap: var(--sp-xl);
+  justify-items: center;
+  text-align: center;
+}
+
+.landing-pie {
+  animation-delay: 0.68s;
+}
+.landing-nota {
+  animation-delay: 0.78s;
+}
+
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* El logotipo se descubre de izquierda a derecha, como si se imprimiera.
+   `clip-path` se anima en el compositor; recortar con `width` no. */
+.landing-logo {
+  color: var(--landing-logo);
+  clip-path: inset(0 100% 0 0);
+  animation: revelar 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.18s forwards;
+}
+
+@keyframes revelar {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.landing-titulos h1 {
+  font-size: var(--fs-display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+
+.landing-lema {
+  margin-top: 7px;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.landing-linea {
+  width: 78px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--amgen), transparent);
+  transform: scaleX(0);
+  animation: extender 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+}
+
+@keyframes extender {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.landing-programas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: var(--sp-xl);
+}
+
+.acceso {
+  position: relative;
+  padding: 1px; /* deja ver el borde degradado de debajo */
+  border-radius: 16px;
+  background: var(--landing-borde);
+  text-align: left;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: forwards;
+}
+
+.acceso:hover {
+  transform: translateY(-3px);
+}
+
+/* Borde vivo: un degradado cónico que gira. Se apoya en @property, que permite
+   interpolar un ángulo; donde no exista, el borde se queda quieto y la tarjeta
+   sigue perfectamente usable. */
+@property --giro {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.acceso-borde {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: conic-gradient(
+    from var(--giro),
+    transparent 0deg,
+    var(--amgen) 70deg,
+    rgba(120, 190, 255, 0.9) 110deg,
+    transparent 180deg,
+    transparent 360deg
+  );
+}
+
+.acceso:hover .acceso-borde,
+.acceso:focus-visible .acceso-borde {
+  opacity: 1;
+  animation: girar 4s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    --giro: 360deg;
+  }
+}
+
+.acceso-cuerpo {
+  position: relative;
+  display: grid;
+  gap: var(--sp-lg);
+  padding: var(--sp-2xl) var(--sp-2xl) var(--sp-xl);
+  border-radius: 15px;
+  background: var(--landing-panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Foco que sigue al cursor. Las coordenadas llegan por variable CSS desde el
+   propio evento: no pasa por el estado de React, así que mover el ratón no
+   provoca ni un renderizado. */
+.acceso-cuerpo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(0, 99, 195, 0.18),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.acceso:hover .acceso-cuerpo::before {
+  opacity: 1;
+}
+
+.acceso-alto {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+}
+
+.acceso-nombre {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.acceso-estado {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: var(--sp-xs) var(--sp-lg);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.acceso-estado.cargado {
+  color: var(--ink-good);
+  border-color: var(--accent-green);
+  background: var(--tint-green);
+}
+
+.acceso-estado .punto {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.75;
+}
+
+.acceso-desc {
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.acceso-bajo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  margin-top: 2px;
+}
+
+.acceso-modulos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+}
+
+.modulo {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: var(--sp-xs) var(--sp-md);
+  border-radius: 5px;
+  color: var(--text-muted);
+  background: var(--bg-card-hover);
+}
+
+.acceso-flecha {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--amgen);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  flex-shrink: 0;
+}
+
+.acceso:hover .acceso-flecha {
+  transform: translateX(4px);
+}
+
+.landing-pie {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xl);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.landing-acciones {
+  display: flex;
+  gap: var(--sp-lg);
+  flex-wrap: wrap;
+}
+
+.landing-saltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-md);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.landing-saltar input {
+  accent-color: var(--amgen);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.landing-nota {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-md);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.landing-nota svg {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+/* Volver a la portada desde la cabecera: el logotipo es el botón, como en
+   cualquier sitio web. */
+.marca-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  padding: var(--sp-xs) var(--sp-lg) var(--sp-xs) var(--sp-sm);
+  margin-left: -6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  transition: var(--transition);
+  text-align: left;
+}
+
+.marca-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+/* El mismo criterio que en la portada: azul de marca sobre claro, blanco sobre
+   oscuro. Reutiliza el token, no lo duplica. */
+.marca-logo {
+  color: var(--landing-logo);
+  flex-shrink: 0;
+}
+
+.marca-sep {
+  width: 1px;
+  height: 24px;
+  background: var(--border-light);
+  flex-shrink: 0;
+}
+
+.marca-textos {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Eran <div> dentro de la cabecera; ahora son <span> dentro de un <button>
+   (un <div> dentro de <button> es HTML inválido), así que necesitan el bloque. */
+.brand-title,
+.brand-sub {
+  display: block;
+}
+
+@media (max-width: 620px) {
+  .landing {
+    padding: var(--sp-3xl) var(--sp-xl);
+  }
+  .landing-contenido {
+    gap: var(--sp-2xl);
+  }
+  .marca-sep {
+    display: none;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+/* Los grids se apañan solos con minmax(min(...)). Estos cortes son para las
+   piezas que sí necesitan reordenarse: cabecera, KPI hero y densidad. */
+
+@media (max-width: 1200px) {
+  .kpi-card-hero {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: var(--sp-lg);
+    padding: var(--sp-lg) var(--sp-xl);
+  }
+
+  .prog-switch {
+    order: 3;
+    width: 100%;
+  }
+
+  .prog-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .header-right {
+    margin-left: auto;
+  }
+
+  .tabs,
+  .main {
+    padding-left: var(--sp-xl);
+    padding-right: var(--sp-xl);
+  }
+
+  .kpi-card-hero {
+    grid-column: 1 / -1;
+  }
+
+  .kpi-card-hero .kpi-value {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 620px) {
+  html {
+    font-size: var(--fs-base);
+  }
+
+  .main {
+    padding: var(--sp-lg) var(--sp-lg) var(--sp-3xl);
+  }
+
+  .tabs {
+    padding: 0 var(--sp-lg);
+  }
+
+  .filter-group {
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .data-status {
+    display: none;
+  }
+
+  .card {
+    padding: var(--sp-lg);
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+  }
+}
+
+/* ===== IMPRESIÓN ===== */
+/* El dashboard se pega en presentaciones y se archiva en PDF. Sobre papel, el
+   fondo oscuro es una plancha de tóner y los controles son ruido: aquí se
+   fuerza el tema claro, se quita todo lo que no se puede pulsar en papel y se
+   impide que una tarjeta se parta entre dos páginas. */
+@media print {
+  :root,
+  :root[data-theme='dark'],
+  :root[data-theme='light'] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f5f7fa;
+    --bg-input: #ffffff;
+    --border: #d5dbe6;
+    --border-light: #b9c2d0;
+    --text-primary: #111318;
+    --text-secondary: #3f4655;
+    --text-muted: #6a7183;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+
+  /* Sin esto, Chrome descarta los fondos de badges y alertas al imprimir. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Apaisado. Esto es un TABLERO: rejillas de dos columnas y tablas de hasta
+     dieciséis. En vertical quedan 186 mm útiles y no caben —de ahí que se
+     salieran de la caja—; en apaisado son 277 mm, un 49 % más, y todo entra sin
+     encoger la letra hasta lo ilegible.
+     `size: landscape` a secas y no `A4 landscape`: así se respeta el tamaño de
+     papel que tenga configurado cada quien (aquí A4, pero Carta en otros sitios)
+     y solo se cambia la orientación. */
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .app-header,
+  .tabs,
+  .filters-bar,
+  .toolbar,
+  .subtabs,
+  .toast-stack,
+  .no-print,
+  .dropzone,
+  /* La retícula molecular es `position: fixed`: al imprimir, algunos navegadores
+     la repiten en TODAS las páginas y otros la estiran sobre la primera. En
+     papel no aporta nada, así que fuera. */
+  .app-fondo {
+    display: none !important;
+  }
+
+  .print-header {
+    display: block;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #111318;
+  }
+
+  .print-header h1 {
+    font-size: var(--fs-lg);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .print-header p {
+    font-size: var(--fs-xs);
+    color: #3f4655;
+    margin-top: 3px;
+  }
+
+  .main {
+    padding: 0;
+    max-width: none;
+  }
+
+  .card,
+  .kpi-card,
+  .alert,
+  .alerts {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none;
+  }
+
+  .print-break {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* En papel no hay scroll: una tabla recortada a 290 px pierde las filas de
+     abajo sin avisar, que es justo lo que no puede pasar en un informe. */
+  .table-scroll {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  thead th {
+    position: static;
+  }
+
+  /* Todas las rejillas a dos columnas, incluidas las que no estaban aquí.
+     `.grid-4` y `.grid-geo` se quedaron fuera cuando se añadieron y seguían con
+     su reparto de pantalla: `.grid-geo` reservaba una columna FIJA de 420 px
+     —pensada para que el mapa no quedara nadando— que en papel se comía más de
+     la mitad del ancho y aplastaba la gráfica de al lado. */
+  .grid-2,
+  .grid-3,
+  .grid-4,
+  .grid-geo {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* ── Gráficas ──────────────────────────────────────────────────────────
+     Aquí NO se escala nada, y el intento anterior de hacerlo era doblemente malo.
+
+     ECharts fija el ancho del <canvas> en píxeles con la medida que tenía en
+     pantalla, y al imprimir la tarjeta se estrecha: la gráfica sobresale e invade
+     la de al lado —era la leyenda del donut cayendo encima de la tabla—. Se
+     intentó arreglar con `max-width` y `position: static` en el canvas, y falla
+     por dos motivos:
+
+     · El <canvas> no es hijo directo del contenedor; en medio hay un div de
+       zrender que conserva el ancho viejo. Constreñir el canvas no sirve de nada
+       si su padre sigue midiendo 660 px.
+     · Peor: ECharts crea UN CANVAS POR `zlevel`, superpuestos. El mapa tiene dos
+       —el coroplético y los focos que laten—. Sacarlos del posicionamiento
+       absoluto los habría apilado en vertical: el mapa dos veces, uno debajo del
+       otro.
+
+     La solución está en `usePrintReport`: antes de imprimir se estrecha la página
+     al ancho del papel, ECharts se entera por su propio sensor de tamaño y
+     REDIBUJA a la medida buena. Sale nítido, no un mapa de bits reducido.
+
+     Lo único que queda aquí es la red de seguridad: si algo se escapa, que se
+     recorte dentro de su tarjeta y no encima de la vecina. */
+  .card {
+    overflow: hidden;
+  }
+
+  /* ── Tablas anchas ────────────────────────────────────────────────────
+     En pantalla las celdas van en `nowrap` y la tabla se desliza dentro de su
+     caja. En papel no hay dónde deslizarse, así que una tabla de dieciséis
+     columnas —la de Estado MIPRES— se salía por el lado derecho. Quitándole el
+     `nowrap`, el texto parte y la tabla se ajusta al ancho disponible en vez de
+     imponer el suyo.
+
+     `overflow-wrap` y NO `word-break: break-word`, que es lo que había aquí y
+     partía las palabras LETRA POR LETRA — "Tratamiento" salía como una columna
+     de once caracteres, uno debajo de otro.
+
+     La diferencia está en cómo cada uno afecta al ancho MÍNIMO de la celda, que
+     es de donde el navegador saca el reparto de columnas cuando la tabla no cabe:
+
+     · `word-break: break-word` deja partir por cualquier sitio, así que el
+       mínimo de una celda pasa a ser UN carácter. Al no caber la tabla, el
+       navegador aprieta hasta ese mínimo y sale lo de la captura.
+     · `overflow-wrap: break-word` no toca el mínimo —sigue siendo la palabra más
+       larga— y solo parte una palabra cuando por sí sola no cabría en su línea.
+       Así el reparto es sensato y un nombre kilométrico tampoco desborda. */
+  thead th,
+  tbody td,
+  tfoot td {
+    white-space: normal !important;
+    overflow-wrap: break-word;
+  }
+
+  /* Sin `table-layout: fixed`: repartiría el ancho a partes iguales y le daría a
+     la columna "#" lo mismo que a "Institución". Dejando el reparto automático,
+     el navegador mide el contenido — y como arriba se le ha quitado el `nowrap`,
+     ya puede encoger la tabla hasta el ancho disponible en vez de desbordarla.
+
+     El tamaño se fija en `th` y `td` y no solo en la tabla: `thead th` trae su
+     propio `font-size`, y un valor puesto directamente en el elemento gana a uno
+     heredado del padre por muy específico que sea el selector del padre. Sin
+     esto, las cabeceras seguían a 11 px y son justo lo más ancho de la tabla. */
+  .table-scroll table,
+  .table-scroll th,
+  .table-scroll td {
+    font-size: 9.5px;
+  }
+
+  /* Relleno de celda mucho más apretado. Los 12 px de cada lado que se ven bien
+     en pantalla son 24 px por columna: en una tabla de dieciséis, 384 px de puro
+     aire — más de un tercio del ancho del papel gastado en márgenes internos. */
+  .table-scroll th,
+  .table-scroll td {
+    padding: 3px 4px;
+  }
+
+  .table-scroll td.num,
+  .table-scroll th.num {
+    /* Las cifras NO parten: un "1.247" cortado en dos líneas deja de ser un
+       número. Son cortas, así que caben igual. */
+    white-space: nowrap !important;
+  }
+
+  .kpi-card-hero {
+    grid-column: span 2;
+  }
+
+  a[href]::after {
+    content: '';
+  }
+}
